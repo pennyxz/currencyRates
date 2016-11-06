@@ -1,0 +1,88 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/usdLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" 1 USD"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:layout_centerVertical="true"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="="
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:layout_centerVertical="true"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/valueCurrency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 123,456"
+                android:textSize="30dp"
+                android:padding="8dp"
+                android:textAlignment="textEnd"
+                android:layout_centerVertical="true"
+                android:layout_weight="1"
+                android:layout_gravity="end" />
+
+            <TextView
+                android:id="@+id/codeCurrency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GBP"
+                android:textSize="30dp"
+                android:padding="8dp"
+                android:textAlignment="textStart"
+                android:layout_centerVertical="true"
+                android:layout_weight="1"
+                android:layout_gravity="start" />
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lastUpdateLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="November, 2016"
+            android:textSize="20dp"
+            android:textAlignment="center"
+            android:layout_centerVertical="true"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listHist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawSelectorOnTop="false"/>
+
+</LinearLayout>

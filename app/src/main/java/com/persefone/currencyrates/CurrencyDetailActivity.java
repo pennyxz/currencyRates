@@ -30,6 +30,7 @@ public class CurrencyDetailActivity extends AppCompatActivity {
     private TextView mCurrencyValueText;
     private TextView mCurrencyCode;
     private TextView mCurrencyLastUpdate;
+    private TextView mCurrencySymbol;
 
 
     @Override
@@ -51,22 +52,38 @@ public class CurrencyDetailActivity extends AppCompatActivity {
 
             mMonthsExchanges = Data.get(CurrencyDetailActivity.this).getMonthExchanges(mCurrency);
 
-            ExchangeAdapter adapter = new ExchangeAdapter(mMonthsExchanges, CurrencyDetailActivity.this);
+            ExchangeAdapter adapter = new ExchangeAdapter(mMonthsExchanges, CurrencyDetailActivity.this, mLastExchange);
 
             listView.setAdapter(adapter);
 
             mCurrencyValueText = (TextView) findViewById(R.id.valueCurrency);
             mCurrencyCode = (TextView) findViewById(R.id.codeCurrency);
+            mCurrencySymbol = (TextView) findViewById(R.id.currencySymbolDetail);
 
             String startDateString;
             DateFormat df = new SimpleDateFormat("MMMM dd, yyyy");
             startDateString = df.format(mLastExchange.getmDate());
 
-            mCurrencyLastUpdate = (TextView) findViewById(R.id.lastUpdateLabel);
+            mCurrencyLastUpdate = (TextView) findViewById(R.id.lastUpdateValue);
 
             mCurrencyValueText.setText(mLastExchange.getmValue().toString());
             mCurrencyCode.setText(mCurrency.getmCode());
             mCurrencyLastUpdate.setText(startDateString);
+
+            switch (mCurrency.getmCode()) {
+                case "GBP":
+                    mCurrencySymbol.setText("£");
+                    break;
+                case "EUR":
+                    mCurrencySymbol.setText("€");
+                    break;
+                case "JPY":
+                    mCurrencySymbol.setText("¥");
+                    break;
+                case "BRL":
+                    mCurrencySymbol.setText("R$");
+                    break;
+            }
         } else {
             Toast.makeText(getApplicationContext(),
                     "There is no Exchange data on Database. Try getting online once",
@@ -75,5 +92,4 @@ public class CurrencyDetailActivity extends AppCompatActivity {
         }
 
     }
-
 }

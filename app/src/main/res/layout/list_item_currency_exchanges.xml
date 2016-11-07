@@ -13,33 +13,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout">
 
         <TextView
-            android:id="@+id/exchangeDate"
+            android:id="@+id/exchangeCurrencyValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:layout_centerVertical="true"
-            android:text="November, 2016"
-            android:textSize="16sp"
-            android:textColor="#2d3e50"
-            />
-
-        <TextView
-            android:id="@+id/exchangeCurrencyValue"
-            android:layout_width="133dp"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:layout_centerVertical="true"
-            android:textAlignment="textEnd"
-            android:layout_gravity="end"
             android:text="123,456"
             android:textSize="16sp"
             android:textColor="#2d3e50"
-            />
+            android:layout_alignBottom="@+id/linearLayout"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
         <TextView
             android:id="@+id/exchangeCurrencyCode"
@@ -50,7 +38,8 @@
             android:layout_gravity="start"
             android:textSize="16sp"
             android:textColor="#2d3e50"
-            android:layout_centerVertical="true"
+            android:layout_alignBottom="@+id/linearLayout"
+            android:layout_toRightOf="@+id/exchangeCurrencyValue"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
@@ -62,5 +51,19 @@
         android:background="#e1e1e1"
         android:layout_alignParentBottom="true"
         android:id="@+id/view" />
+
+    <TextView
+        android:id="@+id/exchangeDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="November, 2016"
+        android:textSize="16sp"
+        android:textColor="#2d3e50"
+        android:layout_alignBottom="@+id/linearLayout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 
 </RelativeLayout>

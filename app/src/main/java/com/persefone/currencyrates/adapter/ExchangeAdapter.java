@@ -1,6 +1,7 @@
 package com.persefone.currencyrates.adapter;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -17,10 +18,12 @@ import java.util.List;
 
 public class ExchangeAdapter extends ArrayAdapter<Exchange> {
     private Activity mActivity;
+    private Exchange lastExchange;
 
-    public ExchangeAdapter(List<Exchange> exchanges, Activity activity) {
+    public ExchangeAdapter(List<Exchange> exchanges, Activity activity, Exchange lastExchange) {
         super(activity, 0, exchanges);
         mActivity = activity;
+        this.lastExchange = lastExchange;
     }
 
     @Override
@@ -31,8 +34,25 @@ public class ExchangeAdapter extends ArrayAdapter<Exchange> {
 
         Exchange exchange = getItem(position);
 
+
         TextView dateTextView = (TextView) convertView.findViewById(R.id.exchangeDate);
         TextView currentValueTextView = (TextView) convertView.findViewById(R.id.exchangeCurrencyValue);
+        TextView currentCode = (TextView) convertView.findViewById(R.id.exchangeCurrencyCode);
+
+        switch (exchange.getmCurrency().getmCode()) {
+            case "GBP":
+                currentCode.setText("£");
+                break;
+            case "EUR":
+                currentCode.setText("€");
+                break;
+            case "JPY":
+                currentCode.setText("¥");
+                break;
+            case "BRL":
+                currentCode.setText("R$");
+                break;
+        }
 
         String startDateString;
         DateFormat df = new SimpleDateFormat("MMMM, yyyy");
@@ -41,6 +61,14 @@ public class ExchangeAdapter extends ArrayAdapter<Exchange> {
 
         dateTextView.setText(startDateString);
         currentValueTextView.setText(exchange.getmValue().toString());
+
+        if (lastExchange.getmValue() > exchange.getmValue()) {
+            currentValueTextView.setTextColor(Color.RED);
+        } else if (lastExchange.getmValue() < exchange.getmValue()) {
+            currentValueTextView.setTextColor(Color.GREEN);
+        } else {
+            currentValueTextView.setTextColor(Color.GRAY);
+        }
 
         return convertView;
     }

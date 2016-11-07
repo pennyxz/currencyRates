@@ -109,7 +109,24 @@ public class DBHelper extends SQLiteOpenHelper {
         List<Exchange> list = new ArrayList<Exchange>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + EXCHANGE_TABLE_NAME + "", null);
+        Cursor res = db.rawQuery("select * from " + EXCHANGE_TABLE_NAME + " order by date" , null);
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+
+            list.add(createExchangeObject(res));
+
+            res.moveToNext();
+        }
+        return list;
+    }
+
+    public List<Exchange> getAllExchangesByCurrency(int currency) {
+        List<Exchange> list = new ArrayList<Exchange>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + EXCHANGE_TABLE_NAME + " where "+EXCHANGE_COLUMN_CURRENCY+" = "+currency
+                +" order by date" , null);
         res.moveToFirst();
 
         while (res.isAfterLast() == false) {

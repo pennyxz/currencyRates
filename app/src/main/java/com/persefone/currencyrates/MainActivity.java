@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     // URL to get funny JSON
     private static String url = "http://api.fixer.io/latest?base=USD";
+    private static String baseUrl = "http://api.fixer.io/";
     public static final String CURRENCY_ID = "currency_id";
 
     private String TAG = MainActivity.class.getSimpleName();
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mExchanges = new ArrayList<>();
         data = Data.get(MainActivity.this);
 
         listView = (ListView) findViewById(R.id.list);
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         mCurrencyOnlineTag = (TextView) findViewById(R.id.offlineTag);
 
         new GetCurrencies().execute();
+
 
         mCurrencyValueToConvert.addTextChangedListener(new TextWatcher() {
             @Override
@@ -122,62 +126,42 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
+            boolean cantConnect=false;
             HttpHandler sh = new HttpHandler();
 
-            // Making a request to url and getting response
-            String jsonStr = sh.makeServiceCall(url);
+            for (int month=0; month<= new Date().getMonth(); month++) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(new Date());
+                calendar.set(Calendar.MONTH, month);
+                int day= calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH,day);
+                //Getting last day of the month. If it's more
+                //than the current date, fixer.io will send json for this current date
 
-            Log.e(TAG, "Response from url: " + jsonStr);
+                String startDateString;
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = calendar.getTime();
+                startDateString = df.format(date);
 
-            if (jsonStr != null) {
-                try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
+                String url = baseUrl+startDateString+"?base=USD";
+                String jsonStr = sh.makeServiceCall(url);
 
-                    // Getting JSON Array node
-                    String startDateString = jsonObj.getString("date");
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date = null;
-                    try {
-                        date = df.parse(startDateString);
-                        String newDateString = df.format(date);
-                    } catch (ParseException e) {
-                        Log.e(TAG, "Parse Exception");
-                    }
+                Log.e(TAG, "Response from url: " + jsonStr);
 
-                    JSONObject rates = jsonObj.getJSONObject("rates");
-                    Double pound = rates.getDouble("GBP");
-                    Double euro = rates.getDouble("EUR");
-                    Double yen = rates.getDouble("JPY");
-                    Double brasil = rates.getDouble("BRL");
+                if (jsonStr != null) {
 
-                    mExchanges = new ArrayList<>();
+                    extractJsonToExchanges(jsonStr);
 
-                    Exchange exchangeUK = new Exchange(101, data.getCurrency("GBP"), pound, date);
-                    Exchange exchangeEU = new Exchange(100, data.getCurrency("EUR"), euro, date);
-                    Exchange exchangeJP = new Exchange(102, data.getCurrency("JPY"), yen, date);
-                    Exchange exchangeBR = new Exchange(103, data.getCurrency("BRL"), brasil, date);
-
-                    mExchanges.add(exchangeUK);
-                    mExchanges.add(exchangeEU);
-                    mExchanges.add(exchangeJP);
-                    mExchanges.add(exchangeBR);
-
-
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    });
+                } else {
+                    cantConnect = true;
+                    Log.e(TAG, "Couldn't get json from server.");
+                   
 
                 }
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
+
+            }
+            if (cantConnect)
+            {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -190,10 +174,56 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-
             }
 
             return null;
+        }
+
+        private void extractJsonToExchanges(String jsonStr) {
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+
+                // Getting JSON Array node
+                String startDateString = jsonObj.getString("date");
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = null;
+                try {
+                    date = df.parse(startDateString);
+                    String newDateString = df.format(date);
+                } catch (ParseException e) {
+                    Log.e(TAG, "Parse Exception");
+                }
+
+                JSONObject rates = jsonObj.getJSONObject("rates");
+                Double pound = rates.getDouble("GBP");
+                Double euro = rates.getDouble("EUR");
+                Double yen = rates.getDouble("JPY");
+                Double brasil = rates.getDouble("BRL");
+
+                Exchange exchangeUK = new Exchange(101, data.getCurrency("GBP"), pound, date);
+                Exchange exchangeEU = new Exchange(100, data.getCurrency("EUR"), euro, date);
+                Exchange exchangeJP = new Exchange(102, data.getCurrency("JPY"), yen, date);
+                Exchange exchangeBR = new Exchange(103, data.getCurrency("BRL"), brasil, date);
+
+                mExchanges.add(exchangeUK);
+                mExchanges.add(exchangeEU);
+                mExchanges.add(exchangeJP);
+                mExchanges.add(exchangeBR);
+
+
+            } catch (final JSONException e) {
+                Log.e(TAG, "Json parsing error: " + e.getMessage());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Json parsing error: " + e.getMessage(),
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+
+            }
         }
 
         @Override
@@ -205,10 +235,13 @@ public class MainActivity extends AppCompatActivity {
             if (mExchanges != null) {
                 data.updateDBExchanges(mExchanges);
             }
+
+            mExchanges = new ArrayList<>();
             adapter = new CurrencyValueAdapter(data.getmCurrencies(), MainActivity.this);
             listView.setAdapter(adapter);
 
         }
 
     }
+
 }

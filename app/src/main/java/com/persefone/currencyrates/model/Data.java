@@ -114,11 +114,13 @@ public class Data {
     }
 
     public Exchange getLatestExchangeRate(Currency currency) {
-        for (Exchange exchange : mExchanges) {
-            if (exchange.getmCurrency().getmCode().equals(currency.getmCode()))
-                return exchange;
+
+        List<Exchange> exchangesByCurrency = mydb.getAllExchangesByCurrency(currency.getmID());
+        if (exchangesByCurrency != null && exchangesByCurrency.size() != 0) {
+            return exchangesByCurrency.get(exchangesByCurrency.size() - 1);
+        } else {
+            return null;
         }
-        return null;
     }
 
     public Double calculateExchange(Integer usdValue, Currency currency) {
@@ -130,12 +132,7 @@ public class Data {
     }
 
     public List<Exchange> getMonthExchanges(Currency currency) {
-        List<Exchange> exchanges = new ArrayList<>();
-        for (Exchange exchange : mExchanges) {
-            if (exchange.getmCurrency().getmCode().equals(currency.getmCode()))
-                exchanges.add(exchange);
-        }
-        return exchanges;
+        return mydb.getAllExchangesByCurrency(currency.getmID());
     }
 
     public void updateDBExchanges(List<Exchange> mExchanges) {
@@ -143,10 +140,10 @@ public class Data {
         for (Exchange exc : mExchanges) {
             Exchange exchangeDB = findExchangeInDB(exc);
             if (exchangeDB != null) {
-                if (!exc.getmValue().equals(exc.getmValue())) {
-                    exchangeDB.setmValue(exc.getmValue());
-                    mydb.updateExchage(exchangeDB);
-                }
+                exchangeDB.setmValue(exc.getmValue());
+                exchangeDB.setmDate(exc.getmDate());
+                mydb.updateExchage(exchangeDB);
+
             } else {
                 //Maybe a new month, so add!
                 mydb.insertExchange(exc);
